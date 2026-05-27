@@ -468,22 +468,45 @@ function startConfetti() {
 }
 
 // ── ticket slider ─────────────────────────────────
+const SLIDE_COUNT = 2;
 let slideIdx = 0;
-const track = document.getElementById('ticket-track');
-const dots  = document.querySelectorAll('.slider-dot');
+const track   = document.getElementById('ticket-track');
+const sliderEl= document.getElementById('ticket-slider');
+const dots    = document.querySelectorAll('.slider-dot');
 
-function goSlide(i) {
-  slideIdx = i;
-  track.style.transform = `translateX(-${i * 100}%)`;
-  dots.forEach((d, j) => d.classList.toggle('active', j === i));
+function goSlide(i, animate = true) {
+  slideIdx = Math.max(0, Math.min(SLIDE_COUNT - 1, i));
+  track.style.transition = animate ? 'transform .35s cubic-bezier(.4,0,.2,1)' : 'none';
+  track.style.transform  = `translateX(-${slideIdx * 100}%)`;
+  dots.forEach((d, j) => d.classList.toggle('active', j === slideIdx));
 }
 
-let touchStartX = 0;
-track.addEventListener('touchstart', e => { touchStartX = e.touches[0].clientX; }, { passive: true });
-track.addEventListener('touchend', e => {
-  const dx = e.changedTouches[0].clientX - touchStartX;
-  if (Math.abs(dx) > 40) goSlide(dx < 0 ? Math.min(1, slideIdx + 1) : Math.max(0, slideIdx - 1));
-});
+let dragX0 = 0, dragT0 = 0, dragging = false;
+
+function dragStart(x) {
+  dragX0 = x; dragT0 = Date.now(); dragging = true;
+  track.style.transition = 'none';
+}
+function dragMove(x) {
+  if (!dragging) return;
+  let dx = x - dragX0;
+  // rubber-band resistance at edges
+  if ((slideIdx === 0 && dx > 0) || (slideIdx === SLIDE_COUNT - 1 && dx < 0)) dx *= 0.2;
+  track.style.transform = `translateX(calc(-${slideIdx * 100}% + ${dx}px))`;
+}
+function dragEnd(x) {
+  if (!dragging) return;
+  dragging = false;
+  const dx = x - dragX0;
+  const v  = dx / Math.max(1, Date.now() - dragT0); // px/ms
+  if      (v < -0.25 || dx < -50) goSlide(slideIdx + 1);
+  else if (v >  0.25 || dx >  50) goSlide(slideIdx - 1);
+  else                              goSlide(slideIdx);       // snap back
+}
+
+track.addEventListener('touchstart', e => dragStart(e.touches[0].clientX), { passive: true });
+track.addEventListener('touchmove',  e => dragMove(e.touches[0].clientX),  { passive: true });
+track.addEventListener('touchend',   e => dragEnd(e.changedTouches[0].clientX));
 </script>
 </body>
 </html>
