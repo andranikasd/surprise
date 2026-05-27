@@ -4,9 +4,18 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <meta name="theme-color" content="#0d0020">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta property="og:title" content="💝 Անակնկալ">
+  <meta property="og:description" content="Ի՞նչ կա ներսում... Բաց արա 🎁">
+  <meta property="og:image" content="https://surprise.mxnq.net/ticket1.png">
+  <meta property="og:url" content="https://surprise.mxnq.net">
+  <meta property="og:type" content="website">
   <title>💝 Անակնկալ</title>
-  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.googleapis.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+  <link rel="preload" as="image" href="ticket1.png">
+  <link rel="preload" as="image" href="ticket2.png">
   <style>
     :root {
       --pink:   #ff6eb4;
@@ -30,9 +39,10 @@
     .screen {
       position: fixed; inset: 0;
       display: flex; flex-direction: column;
-      align-items: center; justify-content: center;
+      align-items: center; justify-content: flex-start;
       padding: 28px 22px;
       overflow-y: auto;
+      -webkit-overflow-scrolling: touch;
       transition: opacity .55s ease, transform .55s ease;
     }
     .screen.out {
@@ -45,6 +55,7 @@
     .content {
       position: relative; z-index: 1;
       text-align: center;
+      margin: auto;
       animation: fadeUp .6s ease both;
     }
     @keyframes fadeUp {
@@ -237,7 +248,7 @@
 <!-- ══ SCREEN 1 — INTRO ════════════════════════════════ -->
 <div class="screen" id="s-intro">
   <div class="content">
-    <span class="gift-emoji">🎁</span>
+    <span class="gift-icon">🎁</span>
     <p class="intro-msg">
       <span class="name" id="her-name">Սիրելի Անի</span>,<br>
       ես <strong>հատուկ քեզ համար</strong><br>
