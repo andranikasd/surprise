@@ -191,7 +191,7 @@
     }
     .card-msg strong { color: var(--pink); }
 
-    #ticket-canvas {
+    #ticket-img {
       display: block;
       width: calc(100% + 44px);
       margin: 16px -22px -26px;
@@ -251,12 +251,11 @@
         Դու հաղթեցիր <strong>թատրոնի տոմսեր</strong>! 🎭<br>
         Ահա քո <strong>անակնկալը</strong> 💝
       </p>
-      <canvas id="ticket-canvas"></canvas>
+      <img id="ticket-img" src="tickets.png" alt="Տոմսեր">
     </div>
   </div>
 </div>
 
-<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
 <script>
 // ═══════════════════════════════════════════════════════
 //  ✏️  CONFIG — fill these in before sharing the link
@@ -299,43 +298,6 @@ function showResult() {
   document.getElementById('s-result').classList.remove('out');
   startConfetti();
   try { navigator.vibrate && navigator.vibrate([80, 40, 80, 40, 260]); } catch (_) {}
-  renderTickets();
-}
-
-async function renderTickets() {
-  try {
-    const lib = window['pdfjs-dist/build/pdf'];
-    lib.GlobalWorkerOptions.workerSrc =
-      'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
-
-    const page = await (await lib.getDocument('tickets.pdf').promise).getPage(1);
-    const nativeVp = page.getViewport({ scale: 1 });
-    const scale    = Math.min(window.innerWidth - 56, 460) / nativeVp.width;
-    const vp       = page.getViewport({ scale });
-
-    // Render full page to offscreen canvas
-    const off = document.createElement('canvas');
-    off.width = vp.width; off.height = vp.height;
-    await page.render({ canvasContext: off.getContext('2d'), viewport: vp }).promise;
-
-    // Crop to the ticket area only (top 64 % of the page — skips blank footer)
-    const cv  = document.getElementById('ticket-canvas');
-    const visH = Math.round(vp.height * 0.64);
-    cv.width = vp.width; cv.height = visH;
-    const ctx = cv.getContext('2d');
-    ctx.drawImage(off, 0, 0, vp.width, visH, 0, 0, vp.width, visH);
-
-    // ── Hide price fields ────────────────────────────────────────────────────
-    // White rectangles over "գին` 5000 ֏" in each ticket.
-    // Positions are fractions of the FULL page height (vp.height).
-    // Adjust the y-values below if the coverage is slightly off after testing.
-    ctx.fillStyle = '#ffffff';
-    ctx.fillRect(vp.width * 0.40, vp.height * 0.260, vp.width * 0.57, vp.height * 0.046); // ticket 1
-    ctx.fillRect(vp.width * 0.40, vp.height * 0.558, vp.width * 0.57, vp.height * 0.046); // ticket 2
-
-  } catch (err) {
-    console.error('PDF render error:', err);
-  }
 }
 
 // ── wheel ─────────────────────────────────────────
